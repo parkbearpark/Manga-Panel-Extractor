@@ -2,11 +2,12 @@
 import argparse
 from argparse import RawTextHelpFormatter
 # project
-from panel_extractor import PanelExtractor
+from PanelExtractor.PanelExtractor import PanelExtractor
 
 
 def main(args):
-    panel_extractor = PanelExtractor(keep_text=args.keep_text, min_pct_panel=args.min_panel, max_pct_panel=args.max_panel)
+    panel_extractor = PanelExtractor(
+        keep_text=args.keep_text, min_pct_panel=args.min_panel, max_pct_panel=args.max_panel)
     panel_extractor.extract(args.folder)
 
 
