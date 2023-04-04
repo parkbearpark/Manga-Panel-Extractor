@@ -7,7 +7,7 @@ import numpy as np
 from skimage import measure
 import cv2
 # project
-from main_text_detector import TextDetector
+from .main_text_detector import TextDetector
 from PanelExtractor.utils import get_files, load_image
 
 
