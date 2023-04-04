@@ -8,7 +8,7 @@ from skimage import measure
 import cv2
 # project
 from text_detector.main_text_detector import TextDetector
-from utils import get_files, load_image
+from PanelExtractor.utils import get_files, load_image
 
 
 class PanelExtractor:
@@ -29,17 +29,20 @@ class PanelExtractor:
         blur = cv2.GaussianBlur(img, (5, 5), 0)
         thresh = cv2.threshold(blur, 230, 255, cv2.THRESH_BINARY)[1]
         cv2.rectangle(thresh, (0, 0), tuple(img.shape[::-1]), (0, 0, 0), 10)
-        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(thresh, 4, cv2.CV_32S)
+        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(
+            thresh, 4, cv2.CV_32S)
         ind = np.argsort(stats[:, 4], )[::-1][1]
         panel_block_mask = ((labels == ind) * 255).astype("uint8")
         return panel_block_mask
 
     def generate_panels(self, img):
         block_mask = self._generate_panel_blocks(img)
-        cv2.rectangle(block_mask, (0, 0), tuple(block_mask.shape[::-1]), (255, 255, 255), 10)
+        cv2.rectangle(block_mask, (0, 0), tuple(
+            block_mask.shape[::-1]), (255, 255, 255), 10)
 
         # detect contours
-        contours, hierarchy = cv2.findContours(block_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(
+            block_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         panels = []
 
         for i in range(len(contours)):
@@ -53,7 +56,8 @@ class PanelExtractor:
             x, y, w, h = cv2.boundingRect(contours[i])
             # create panel mask
             panel_mask = np.ones_like(block_mask, "int32")
-            cv2.fillPoly(panel_mask, [contours[i].astype("int32")], color=(0, 0, 0))
+            cv2.fillPoly(
+                panel_mask, [contours[i].astype("int32")], color=(0, 0, 0))
             panel_mask = panel_mask[y:y+h, x:x+w].copy()
             # apply panel mask
             panel = img[y:y+h, x:x+w].copy()
@@ -71,7 +75,8 @@ class PanelExtractor:
         for i, (_, polys) in enumerate(res):
             mask_text = np.zeros_like(imgs[i], "int32")
             for poly in polys:
-                cv2.fillPoly(mask_text, [poly.astype("int32")], color=(255, 255, 255))
+                cv2.fillPoly(mask_text, [poly.astype(
+                    "int32")], color=(255, 255, 255))
             text_masks.append(mask_text)
 
         # self.get_speech_bubble_mask(imgs, text_masks)
