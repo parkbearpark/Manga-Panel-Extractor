@@ -1,5 +1,5 @@
 numpy
-skimage
-cv2
+scikit-image
+opencv-python
 torch
 torchvision
