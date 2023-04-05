@@ -1,1 +1,1 @@
-from PanelExtractor.PanelExtractor import PanelExtractor
+from .PanelExtractor import PanelExtractor
