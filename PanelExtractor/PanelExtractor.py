@@ -127,4 +127,4 @@ class PanelExtractor:
             panels = self.generate_panels(img)
             name, ext = splitext(basename(image_list[i]))
             for j, panel in enumerate(panels):
-                cv2.imwrite(join(output_dir, f'{name}_{j}.{ext}'), panel)
+                cv2.imwrite(join(output_dir, f'{name}_{j}{ext}'), panel)
