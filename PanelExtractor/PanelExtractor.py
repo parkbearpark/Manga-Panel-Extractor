@@ -102,16 +102,15 @@ class PanelExtractor:
             # buble mask
             bubble_masks.append(np.isin(all_labels, labels) * 255)
 
-    def extract(self, folder):
+    def extract(self, input_dir, output_dir):
         print("Loading images ... ", end="")
-        image_list, _, _ = get_files(folder)
+        image_list, _, _ = get_files(input_dir)
         imgs = [load_image(x) for x in image_list]
         print("Done!")
 
         # create panels dir
-        if not exists(join(folder, "panels")):
-            makedirs(join(folder, "panels"))
-        folder = join(folder, "panels")
+        if not exists(output_dir):
+            makedirs(output_dir)
 
         # remove images with paper texture, not well segmented
         paperless_imgs = []
@@ -128,4 +127,4 @@ class PanelExtractor:
             panels = self.generate_panels(img)
             name, ext = splitext(basename(image_list[i]))
             for j, panel in enumerate(panels):
-                cv2.imwrite(join(folder, f'{name}_{j}.{ext}'), panel)
+                cv2.imwrite(join(output_dir, f'{name}_{j}.{ext}'), panel)
