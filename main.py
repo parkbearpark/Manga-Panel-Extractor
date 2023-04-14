@@ -1,6 +1,7 @@
 # stdlib
 import argparse
 from argparse import RawTextHelpFormatter
+import cv2
 # project
 from PanelExtractor.PanelExtractor import PanelExtractor
 
@@ -8,7 +9,12 @@ from PanelExtractor.PanelExtractor import PanelExtractor
 def main(args):
     panel_extractor = PanelExtractor(
         keep_text=args.keep_text, min_pct_panel=args.min_panel, max_pct_panel=args.max_panel)
-    panel_extractor.extract(args.input_folder, args.output_folder)
+    panels = panel_extractor.extract(args.input_folder)
+    for key, imgs in panels.items():
+        cnt = 0
+        for img in imgs:
+            cv2.imwrite(f"./output/{key}_{cnt}.png", img)
+            cnt += 1
 
 
 if __name__ == "__main__":
@@ -24,8 +30,6 @@ if __name__ == "__main__":
                         help="Percentage of minimum panel area in relation to total page area.")
     parser.add_argument("-i", '--input_folder', default='./images/', type=str,
                         help="""folder path to input manga pages.""")
-    parser.add_argument("-o", '--output_folder', default='./images/', type=str,
-                        help="""folder path to output manga panels.""")
 
     args = parser.parse_args()
     main(args)

@@ -102,29 +102,33 @@ class PanelExtractor:
             # buble mask
             bubble_masks.append(np.isin(all_labels, labels) * 255)
 
-    def extract(self, input_dir, output_dir):
+    def extract(self, input_dir):
         print("Loading images ... ", end="")
         image_list, _, _ = get_files(input_dir)
-        imgs = [load_image(x) for x in image_list]
+        imgs = []
+        files = []
+        for x in image_list:
+            imgs.append(load_image(x))
+            files.append(basename(x))
         print("Done!")
-
-        # create panels dir
-        if not exists(output_dir):
-            makedirs(output_dir)
 
         # remove images with paper texture, not well segmented
         paperless_imgs = []
-        for img in tqdm(imgs, desc="Removing images with paper texture"):
+        paperless_files = []
+        for img, file in tqdm(zip(imgs, files), desc="Removing images with paper texture"):
             hist, bins = np.histogram(img.copy().ravel(), 256, [0, 256])
             if np.sum(hist[50:200]) / np.sum(hist) < self.paper_th:
                 paperless_imgs.append(img)
+                paperless_files.append(file)
 
         # remove text from panels
         if not self.keep_text:
             paperless_imgs = self.remove_text(paperless_imgs)
 
+        extracted_panels = {}
         for i, img in tqdm(enumerate(paperless_imgs), desc="extracting panels"):
             panels = self.generate_panels(img)
-            name, ext = splitext(basename(image_list[i]))
-            for j, panel in enumerate(panels):
-                cv2.imwrite(join(output_dir, f'{name}_{j}{ext}'), panel)
+            filename = paperless_files[i]
+            extracted_panels[filename] = panels
+
+        return extracted_panels
